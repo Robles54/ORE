@@ -7,16 +7,16 @@ class Diver:
         self.shots = []
 
     def move_up(self):
-        self.y -= 60
+        self.y -= 50
 
     def move_down(self):
-        self.y += 60
+        self.y += 50
 
     def move_left(self):
-        self.x -= 60
+        self.x -= 50
 
     def move_right(self):
-        self.x += 60
+        self.x += 50
 
     def shoot(self):
         shot = Shot(self.x, self.y)

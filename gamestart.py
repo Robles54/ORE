@@ -4,7 +4,7 @@ import random
 import time
 from diver import Diver
 from asteroid import Asteroid
-# from enemy import Enemy
+from score import Score
 
 class Game:
     def __init__(self):
@@ -17,16 +17,14 @@ class Game:
         self.diver_image = pygame.image.load("image/player_walk_2.png").convert_alpha()
         self.asteroids = []
         self.last_asteroid_spawn_time = pygame.time.get_ticks()  # Time of last asteroid spawn
+        self.score = Score()
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.is_running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_P:
-                    self.is_paused
-                    # self.is paused = not
-                elif event.key == pygame.K_UP:
+                if event.key == pygame.K_UP:
                     self.diver.move_up()
                 elif event.key == pygame.K_DOWN:
                     self.diver.move_down()
@@ -39,8 +37,6 @@ class Game:
 
     def update(self):
         self.diver.update_shots()
-
-        #if not self.is_paused:
 
         # Spawn asteroids every 5 seconds
         current_time = pygame.time.get_ticks()
@@ -60,10 +56,14 @@ class Game:
                     self.asteroids.remove(asteroid)
                     self.diver.shots.remove(shot)
                     break  # Break out of the inner loop once collision is detected
+                
+                if asteroid.collides_with(shot):
+                    self.score.score_up()
 
     def draw(self):
         self.screen.fill((0, 0, 255))
         self.diver.draw_shots(self.screen)
+        self.score.show_score(self.screen)
         self.screen.blit(self.diver_image, (self.diver.x - self.diver_image.get_width() / 2, self.diver.y - self.diver_image.get_height() / 2))
 
         # Draw asteroids
@@ -73,23 +73,20 @@ class Game:
         pygame.display.flip()
 
     def start(self):
-
-        time.sleep(3)
-
         while self.is_running:
             self.handle_events()
             self.update()
             self.draw()
             self.clock.tick(60)
+import time
 
-        if self.is_paused:
-            self.click.tick(1) #Pauses the game 
+# # Add a 3-second pause
+# time.sleep(3)
 
+print('hi')
 
 if __name__ == "__main__":
     game = Game()
     game.start()
     pygame.quit()
-    sys.exit()    
-
-
+    sys.exit()
