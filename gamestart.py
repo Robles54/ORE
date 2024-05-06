@@ -5,6 +5,7 @@ import time
 from diver import Diver
 from asteroid import Asteroid
 from score import Score
+from enemy import Enemy
 
 class Game:
     def __init__(self):
@@ -13,7 +14,7 @@ class Game:
         pygame.display.set_caption("ORE")
         self.clock = pygame.time.Clock()
         self.is_running = True
-        self.diver = Diver(400, 300)
+        self.diver = Diver(400, 300, 20)
         self.diver_image = pygame.image.load("image/player_walk_2.png").convert_alpha()
         self.asteroids = []
         self.last_asteroid_spawn_time = pygame.time.get_ticks()  # Time of last asteroid spawn
@@ -55,10 +56,16 @@ class Game:
                 if asteroid.check_collision(shot):
                     self.asteroids.remove(asteroid)
                     self.diver.shots.remove(shot)
+                    self.score.score_up() #Updates score when there is a collision
                     break  # Break out of the inner loop once collision is detected
                 
-                if asteroid.collides_with(shot):
+                if asteroid.check_collision(shot):
                     self.score.score_up()
+
+            #Checking if there's a collision with diver
+            if self.diver.check_collision(asteroid):
+                self.is_running = False
+                break
 
     def draw(self):
         self.screen.fill((0, 0, 255))

@@ -1,9 +1,10 @@
 import pygame
 
 class Diver:
-    def __init__(self, x, y):
+    def __init__(self, x, y, radius):
         self.x = x
         self.y = y
+        self.radius = radius
         self.shots = []
 
     def move_up(self):
@@ -31,6 +32,10 @@ class Diver:
     def draw_shots(self, screen):
         for shot in self.shots:
             shot.draw(screen)
+
+    def check_collision(self, other_object):
+        distance = ((self.x - other_object.x) ** 2 + (self.y - other_object.y) ** 2) ** 0.5
+        return distance < self.radius + other_object.radius
 
 class Shot:
     def __init__(self, x, y):
