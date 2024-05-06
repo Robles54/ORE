@@ -19,6 +19,7 @@ class Game:
         self.asteroids = []
         self.last_asteroid_spawn_time = pygame.time.get_ticks()  # Time of last asteroid spawn
         self.score = Score()
+        self.game_over = False
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -62,10 +63,18 @@ class Game:
                 if asteroid.check_collision(shot):
                     self.score.score_up()
 
+            if not self.game_over:
+                for asteroid in self.asteroids:
+                    if self.diver.check_collision(asteroid):
+                        self.game_over = True
+                        break
+            else:
+                self.show_game_over_screen()
+
             #Checking if there's a collision with diver
-            if self.diver.check_collision(asteroid):
-                self.is_running = False
-                break
+            # if self.diver.check_collision(asteroid):
+            #     self.is_running = False
+            #     break
 
     def draw(self):
         self.screen.fill((0, 0, 255))
@@ -77,6 +86,13 @@ class Game:
         for asteroid in self.asteroids:
             asteroid.draw(self.screen)
 
+        pygame.display.flip()
+
+    def show_game_over_screen(self):
+        self.screen.fill((0, 0, 0))
+        font = pygame.font.SysFont("comicsans", 50, True, True)
+        text = font.render("Game Over", 1, (255, 255, 255))
+        self.screen.blit(text, (200, 250))
         pygame.display.flip()
 
     def start(self):
