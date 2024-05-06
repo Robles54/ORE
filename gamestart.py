@@ -20,6 +20,7 @@ class Game:
         self.last_asteroid_spawn_time = pygame.time.get_ticks()  # Time of last asteroid spawn
         self.score = Score()
         self.game_over = False
+        self.paused = False
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -36,45 +37,57 @@ class Game:
                     self.diver.move_right()
                 elif event.key == pygame.K_SPACE:
                     self.diver.shoot()
+                elif event.key == pygame.K_p:
+                    self.paused = not self.paused
 
     def update(self):
-        self.diver.update_shots()
+        if not self.paused:
+            self.diver.update_shots()
 
-        # Spawn asteroids every 5 seconds
-        current_time = pygame.time.get_ticks()
-        if current_time - self.last_asteroid_spawn_time > 5000:
-            x = random.randint(0, 800)  # Random x-coordinate
-            asteroid = Asteroid(x, 0)  # Spawn asteroid at the top of the screen
-            self.asteroids.append(asteroid)
-            self.last_asteroid_spawn_time = current_time  # Update last spawn time
+            # Spawn asteroids every 5 seconds
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_asteroid_spawn_time > 5000:
+                x = random.randint(0, 800)  # Random x-coordinate
+                asteroid = Asteroid(x, 0)  # Spawn asteroid at the top of the screen
+                self.asteroids.append(asteroid)
+                self.last_asteroid_spawn_time = current_time  # Update last spawn time
 
         # Move and update asteroids
-        for asteroid in self.asteroids:
-            asteroid.move()
+            for asteroid in self.asteroids:
+                asteroid.move()
 
             # Check collision with shots
-            for shot in self.diver.shots:
-                if asteroid.check_collision(shot):
-                    self.asteroids.remove(asteroid)
-                    self.diver.shots.remove(shot)
-                    self.score.score_up() #Updates score when there is a collision
-                    break  # Break out of the inner loop once collision is detected
+                for shot in self.diver.shots:
+                    if asteroid.check_collision(shot):
+                        self.asteroids.remove(asteroid)
+                        self.diver.shots.remove(shot)
+                        self.score.score_up() #Updates score when there is a collision
+                        break  # Break out of the inner loop once collision is detected
                 
-                if asteroid.check_collision(shot):
-                    self.score.score_up()
+                    if asteroid.check_collision(shot):
+                        self.score.score_up()
 
-            if not self.game_over:
-                for asteroid in self.asteroids:
-                    if self.diver.check_collision(asteroid):
-                        self.game_over = True
-                        break
-            else:
-                self.show_game_over_screen()
+                if not self.game_over:
+                    for asteroid in self.asteroids:
+                        if self.diver.check_collision(asteroid):
+                            self.game_over = True
+                            break
+                else:
+                    self.show_game_over_screen()
+        else:
+            self.show_game_paused_screen()
 
             #Checking if there's a collision with diver
             # if self.diver.check_collision(asteroid):
             #     self.is_running = False
             #     break
+
+    def show_game_paused_screen (self):
+        self.screen.fill((0, 0, 0))
+        font = pygame.font.SysFont("comicsans", 50, True, True)
+        text = font.render("Paused", 1, (255, 255, 255))
+        self.screen.blit(text, (300, 250))
+        pygame.display.flip()
 
     def draw(self):
         self.screen.fill((0, 0, 255))
